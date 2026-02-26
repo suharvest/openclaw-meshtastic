@@ -1,0 +1,9 @@
+{
+  "id": "meshtastic",
+  "channels": ["meshtastic"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

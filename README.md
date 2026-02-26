@@ -39,7 +39,7 @@ https://github.com/user-attachments/assets/demo.mp4
 ## Install
 
 ```bash
-openclaw plugins install openclaw-meshtastic
+openclaw plugins install @seeed-studio/openclaw-meshtastic
 ```
 
 Or install from a local directory during development:

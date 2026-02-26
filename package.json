@@ -1,5 +1,5 @@
 {
-  "name": "openclaw-meshtastic",
+  "name": "@seeed-studio/openclaw-meshtastic",
   "version": "0.1.0",
   "description": "OpenClaw Meshtastic LoRa mesh channel plugin",
   "type": "module",

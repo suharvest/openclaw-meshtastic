@@ -4,7 +4,7 @@ import { meshtasticPlugin } from "./src/channel.js";
 import { setMeshtasticRuntime } from "./src/runtime.js";
 
 const plugin = {
-  id: "openclaw-meshtastic",
+  id: "meshtastic",
   name: "Meshtastic",
   description: "Meshtastic LoRa mesh channel plugin",
   configSchema: emptyPluginConfigSchema(),

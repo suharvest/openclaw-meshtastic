@@ -41,7 +41,7 @@ openclaw channels status --probe
 
 ## Demo
 
-https://github.com/user-attachments/assets/demo.mp4
+https://github.com/user-attachments/assets/a3e46e9d-cf5a-4743-9830-f671a1998ca0
 
 Fallback: [media/demo.mp4](media/demo.mp4)
 

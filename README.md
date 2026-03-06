@@ -97,7 +97,7 @@ The plugin treats Meshtastic as a first-class channel — just like Telegram or 
 
 ## Demo
 
-https://github.com/user-attachments/assets/a3e46e9d-cf5a-4743-9830-f671a1998ca0
+https://github.com/user-attachments/assets/837062d9-a5bb-4e0a-b7cf-298e4bdf2f7c
 
 Fallback: [media/demo.mp4](media/demo.mp4)
 

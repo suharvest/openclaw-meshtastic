@@ -227,10 +227,13 @@ These variables override default-account fields:
 
 ## Demo
 
-Video demo:
+<div align="center">
+
 https://github.com/user-attachments/assets/837062d9-a5bb-4e0a-b7cf-298e4bdf2f7c
 
-Fallback file: [media/demo.mp4](media/demo.mp4)
+</div>
+
+Fallback: [media/demo.mp4](media/demo.mp4)
 
 ## Recommended Hardware
 

@@ -172,17 +172,14 @@ def _fix_lang_switcher(
 # ---------------------------------------------------------------------------
 
 def _strip_preamble(translated: str) -> str:
-    """Remove any content before the first markdown heading.
+    """Remove LLM artifacts while preserving legitimate pre-heading content.
 
-    Handles LLM reasoning artifacts (<think>...</think> blocks),
-    markdown fences, and other preamble text.
+    Only strips known LLM artifacts (<think> blocks, markdown fences).
+    Does NOT remove legitimate HTML before the first heading (e.g. logo images).
     """
     # Strip <think>...</think> reasoning blocks (e.g. from GPT-5, DeepSeek)
     translated = re.sub(r"<think>[\s\S]*?</think>\s*", "", translated)
-    match = re.search(r"^(#[# ]*\s)", translated, re.MULTILINE)
-    if match and match.start() > 0:
-        return translated[match.start():]
-    return translated
+    return translated.strip()
 
 
 def _restore_code_blocks(source: str, translated: str) -> str:
@@ -295,8 +292,10 @@ def _validate_translation(
 ) -> list[str]:
     errors: list[str] = []
 
-    if not translated.strip().startswith("#"):
-        errors.append("Translation does not start with a heading (#)")
+    # Allow HTML before first heading (e.g. logo images)
+    stripped = re.sub(r"<[^>]+>", "", translated).strip()
+    if stripped and not stripped.startswith("#"):
+        errors.append("Translation does not start with a heading or HTML block")
     if len(translated) < len(source) * 0.3:
         errors.append(
             f"Translation suspiciously short ({len(translated)} chars vs "

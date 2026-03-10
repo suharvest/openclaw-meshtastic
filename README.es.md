@@ -270,10 +270,10 @@ Al crear una issue, incluye el modo de transporte, la configuración (sin secret
 ## Desarrollo
 
 ```bash
-git clone https://github.com/Seeed-Solution/openclaw-meshtastic.git
-cd openclaw-meshtastic
+git clone https://github.com/Seeed-Solution/MeshClaw.git
+cd MeshClaw
 npm install
-openclaw plugins install -l ./openclaw-meshtastic
+openclaw plugins install -l ./MeshClaw
 openclaw channels status --probe
 ```
 
@@ -291,7 +291,7 @@ MIT
 
 <!-- Reference-style links -->
 [docs]: https://meshtastic.org/docs/
-[issues]: https://github.com/Seeed-Solution/openclaw-meshtastic/issues
+[issues]: https://github.com/Seeed-Solution/MeshClaw/issues
 [hw-xiao]: https://www.seeedstudio.com/Wio-SX1262-with-XIAO-ESP32S3-p-5982.html
 [hw-wio]: https://www.seeedstudio.com/Wio-Tracker-L1-Pro-p-6454.html
 [hw-sensecap]: https://www.seeedstudio.com/SenseCAP-Card-Tracker-T1000-E-for-Meshtastic-p-5913.html

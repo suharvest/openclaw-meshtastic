@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Seeed-Solution/openclaw-meshtastic"
+    "url": "https://github.com/Seeed-Solution/MeshClaw"
   },
   "keywords": [
     "meshclaw",

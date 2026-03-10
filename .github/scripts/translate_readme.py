@@ -28,9 +28,9 @@ API_URL = os.environ.get(
 )
 MODEL = os.environ.get("LLM_MODEL", "kimi-for-coding")
 API_KEY_VAR = "LLM_API_KEY"
-TIMEOUT = int(os.environ.get("LLM_TIMEOUT", "300"))
+TIMEOUT = int(os.environ.get("LLM_TIMEOUT", "600"))
 MAX_RETRIES = int(os.environ.get("LLM_MAX_RETRIES", "3"))
-RETRY_BASE_DELAY = 10  # seconds
+RETRY_BASE_DELAY = 15  # seconds
 
 _SHARED_RULES = (
     "- Preserve markdown structure exactly: headings, links, tables, inline code, image paths\n"
@@ -247,6 +247,33 @@ def _validate_translation(
     return errors
 
 
+def _stream_response(req: urllib.request.Request) -> str:
+    """Send request with stream=true and assemble SSE chunks into full content."""
+    chunks: list[str] = []
+    with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+        for raw_line in resp:
+            line = raw_line.decode("utf-8", errors="replace").strip()
+            if not line or line.startswith(":"):
+                continue
+            if not line.startswith("data: "):
+                continue
+            data = line[len("data: "):]
+            if data == "[DONE]":
+                break
+            try:
+                parsed = json.loads(data)
+            except json.JSONDecodeError:
+                continue
+            delta = (
+                parsed.get("choices", [{}])[0]
+                .get("delta", {})
+                .get("content", "")
+            )
+            if delta:
+                chunks.append(delta)
+    return "".join(chunks)
+
+
 def _request_translation(
     source_markdown: str,
     api_key: str,
@@ -265,6 +292,7 @@ def _request_translation(
     payload = {
         "model": MODEL,
         "temperature": 0.2,
+        "stream": True,
         "messages": [
             {"role": "system", "content": system_prompt},
             {
@@ -275,22 +303,20 @@ def _request_translation(
         ],
     }
 
-    req = urllib.request.Request(
-        API_URL,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "User-Agent": "claude-code/2.1.71",
-        },
-        method="POST",
-    )
-
     last_exc: Exception | None = None
     for attempt in range(1, MAX_RETRIES + 1):
+        req = urllib.request.Request(
+            API_URL,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "User-Agent": "claude-code/2.1.71",
+            },
+            method="POST",
+        )
         try:
-            with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-                body = resp.read().decode("utf-8")
+            content = _stream_response(req)
             break
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
@@ -307,29 +333,12 @@ def _request_translation(
                 f"  Attempt {attempt}/{MAX_RETRIES} failed, retrying in {delay}s...",
                 file=sys.stderr,
             )
-            # Rebuild request — urllib consumes the body on first send
-            req = urllib.request.Request(
-                API_URL,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                    "User-Agent": "claude-code/2.1.71",
-                },
-                method="POST",
-            )
             time.sleep(delay)
     else:
         raise last_exc  # type: ignore[misc]
 
-    parsed = json.loads(body)
-    choices = parsed.get("choices")
-    if not choices:
-        raise RuntimeError(f"LLM API returned no choices: {body}")
-
-    content = choices[0].get("message", {}).get("content", "")
     if not content:
-        raise RuntimeError(f"LLM API returned empty content: {body}")
+        raise RuntimeError("LLM API returned empty content via streaming")
 
     return _strip_markdown_fence(content)
 
